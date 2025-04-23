@@ -1,4 +1,3 @@
-//src/components/onboarding/StepIndicator.tsx
 import React from "react";
 import { Check } from "lucide-react";
 import { OnboardingStep } from "@/types/onboarding";
@@ -21,13 +20,14 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ steps, currentStep }) => 
           <React.Fragment key={step.id}>
             <div className="flex flex-col items-center">
               <div
-                className={`step-indicator ${
-                  isActive
-                    ? "step-indicator-active"
-                    : isCompleted
-                    ? "step-indicator-completed"
-                    : "step-indicator-upcoming"
-                }`}
+                className={`
+                  flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
+                  ${isActive 
+                    ? "bg-gradient-to-r from-primary to-purple-600 text-white shadow-md" 
+                    : isCompleted 
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" 
+                    : "bg-muted text-muted-foreground"}
+                `}
               >
                 {isCompleted ? <Check size={16} /> : i + 1}
               </div>
@@ -36,7 +36,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ steps, currentStep }) => 
                   isActive
                     ? "text-primary"
                     : isCompleted
-                    ? "text-accent"
+                    ? "text-green-600 dark:text-green-400"
                     : "text-muted-foreground"
                 }`}
               >
@@ -44,10 +44,13 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ steps, currentStep }) => 
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div
-                className={`step-connector ${
-                  currentIndex > i ? "step-connector-active" : ""
-                }`}
+              <div 
+                className={`
+                  h-1 flex-1 mx-2
+                  ${currentIndex > i 
+                    ? "bg-gradient-to-r from-primary to-purple-600" 
+                    : "bg-muted"}
+                `}
               />
             )}
           </React.Fragment>

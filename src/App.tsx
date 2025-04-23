@@ -9,6 +9,7 @@ import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import AuthSuccess from "./pages/auth/AuthSuccess";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth-success" element={<AuthSuccess />} />
           
           {/* Protected routes */}
           <Route path="/onboarding" element={
