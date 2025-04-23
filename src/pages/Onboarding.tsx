@@ -1,5 +1,5 @@
 // src/pages/Onboarding.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import OnboardingLayout from "@/layouts/OnboardingLayout";
 import WelcomeStep from "@/components/onboarding/WelcomeStep";
@@ -13,33 +13,78 @@ import { toast } from "sonner";
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
+  
   const { 
     currentStep, 
     setStep, 
-    fetchOnboardingStatus 
+    fetchOnboardingStatus,
+    isGithubConnected,
+    isSlackConnected
   } = useOnboarding();
 
-  // Check for URL parameters (for OAuth callbacks)
+  // Check for URL parameters and initialize onboarding
   useEffect(() => {
-    const step = searchParams.get("step");
-    const error = searchParams.get("error");
+    const initializeOnboarding = async () => {
+      setIsLoading(true);
+      try {
+        const step = searchParams.get("step");
+        const error = searchParams.get("error");
+        const installation_id = searchParams.get("installation_id");
+        const code = searchParams.get("code");
+        
+        // Handle errors
+        if (error) {
+          toast.error(`Error during setup: ${error.replace(/_/g, ' ')}`);
+        }
+        
+        // Fetch the latest status
+        await fetchOnboardingStatus();
+        
+        // Set appropriate step based on search parameters or OAuth callbacks
+        if (step) {
+          // If a specific step is requested in the URL, use that
+          setStep(step as any);
+        } else if (installation_id) {
+          // If we're returning from GitHub OAuth flow
+          setStep("github");
+          if (isGithubConnected) {
+            toast.success("GitHub connected successfully!");
+          }
+        } else if (code) {
+          // If we're returning from Slack OAuth flow
+          setStep("slack");
+          if (isSlackConnected) {
+            toast.success("Slack connected successfully!");
+          }
+        } else if (currentStep === "welcome") {
+          // If no specific parameters and we're at welcome,
+          // determine initial step based on progress
+          determineInitialStep();
+        }
+      } catch (err) {
+        console.error("Failed to initialize onboarding:", err);
+        toast.error("Failed to load your setup progress");
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Handle errors
-    if (error) {
-      toast.error(`Error during setup: ${error.replace(/_/g, ' ')}`);
-    }
-    
-    // Set step from URL if present
-    if (step) {
-      setStep(step as any);
-    }
-    
-    // Always fetch the latest status
-    fetchOnboardingStatus().catch(err => {
-      console.error("Failed to fetch onboarding status:", err);
-      toast.error("Failed to load your setup progress");
-    });
+    initializeOnboarding();
   }, [searchParams]);
+
+  // Helper function to determine initial step based on onboarding progress
+  const determineInitialStep = () => {
+    if (!isGithubConnected) {
+      setStep("github");
+    } else if (!isSlackConnected) {
+      setStep("slack");
+    } else if (useOnboarding.getState().userMappings.length === 0) {
+      setStep("user-mapping");
+    } else {
+      setStep("configuration");
+    }
+  };
 
   const handleNext = () => {
     if (currentStep === "welcome") setStep("github");
@@ -57,6 +102,15 @@ const Onboarding: React.FC = () => {
   };
 
   const renderStep = () => {
+    // Show loading state while fetching onboarding status
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center p-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      );
+    }
+    
     switch (currentStep) {
       case "welcome":
         return <WelcomeStep onNext={handleNext} />;

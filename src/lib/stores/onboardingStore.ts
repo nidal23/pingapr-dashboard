@@ -1,23 +1,14 @@
-// src/stores/onboardingStore.ts
+// src/lib/stores/onboardingStore.ts
 import { create } from 'zustand';
 import { api } from '@/lib/api';
-import { OnboardingState, OnboardingStep, UserMapping, ConfigSettings } from '@/types/onboarding';
+import { 
+  UserMapping, 
+  OnboardingStore, 
+  GitHubUser,
+  SlackUser
+} from '@/types/onboarding';
+import { Repository, User } from '@/types/database';
 import { DEFAULT_CONFIG } from '@/utils/onboarding';
-
-interface OnboardingStore extends OnboardingState {
-  setStep: (step: OnboardingStep) => void;
-  connectGithub: () => Promise<void>;
-  connectSlack: () => Promise<void>;
-  toggleRepository: (repoId: string, isActive: boolean) => Promise<void>;
-  updateRepositories: (repos: string[]) => void;
-  updateUserMappings: (mappings: UserMapping[]) => Promise<void>;
-  updateConfig: (config: ConfigSettings) => void;
-  completeOnboarding: () => Promise<void>;
-  fetchOnboardingStatus: () => Promise<void>;
-  fetchGithubUsers: () => Promise<string[]>;
-  fetchSlackUsers: () => Promise<string[]>;
-  fetchGithubRepositories: () => Promise<string[]>;
-}
 
 export const useOnboarding = create<OnboardingStore>((set, get) => ({
   currentStep: "welcome",
@@ -29,12 +20,30 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
   
   setStep: (step) => set({ currentStep: step }),
   
+  fetchCurrentUser: async () => {
+    try {
+      const { data } = await api.get<User>('/auth/me');
+      set({ currentUser: data });
+      return data;
+    } catch (error) {
+      console.error('Error fetching current user:', error);
+      throw error;
+    }
+  },
+  
   fetchOnboardingStatus: async () => {
     try {
       const { data } = await api.get('/onboarding/status');
-
-      console.log('data in onboarding status: ', data);
       
+      // Also fetch current user
+      let currentUser: User | undefined;
+      try {
+        currentUser = await get().fetchCurrentUser();
+      } catch (err) {
+        console.error('Failed to fetch current user:', err);
+      }
+      
+      // Update the store with the current status
       set({
         isGithubConnected: data.githubConnected,
         isSlackConnected: data.slackConnected,
@@ -42,21 +51,12 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
         userMappings: data.userMappings.map((mapping: UserMapping) => ({
           githubUsername: mapping.githubUsername,
           slackUserId: mapping.slackUserId,
-          isAdmin: mapping.isAdmin
+          isAdmin: mapping.isAdmin,
+          avatarUrl: mapping.avatarUrl
         })),
-        configSettings: data.settings || DEFAULT_CONFIG
+        configSettings: data.settings || DEFAULT_CONFIG,
+        currentUser
       });
-
-      // Determine current step based on what's been completed
-      if (!data.githubConnected) {
-        set({ currentStep: "github" });
-      } else if (!data.slackConnected) {
-        set({ currentStep: "slack" });
-      } else if (data.userMappings.length === 0) {
-        set({ currentStep: "user-mapping" });
-      } else if (!data.onboardingCompleted) {
-        set({ currentStep: "configuration" });
-      }
       
       return data;
     } catch (error) {
@@ -68,14 +68,12 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
   connectGithub: async () => {
     try {
       // Get GitHub auth URL
-      const { data } = await api.get('/github/installation-url');
+      const { data } = await api.get<{ url: string }>('/github/installation-url');
       
       // Redirect to GitHub for authorization
       window.location.href = data.url;
       
       // Note: This function won't complete here as we're redirecting away
-      // The isGithubConnected state will be updated when we return and
-      // fetch the onboarding status
     } catch (error) {
       console.error('Error connecting to GitHub:', error);
       throw error;
@@ -85,14 +83,12 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
   connectSlack: async () => {
     try {
       // Get Slack auth URL
-      const { data } = await api.get('/slack/auth-url');
+      const { data } = await api.get<{ url: string }>('/slack/auth-url');
       
       // Redirect to Slack for authorization
       window.location.href = data.url;
       
       // Note: This function won't complete here as we're redirecting away
-      // The isSlackConnected state will be updated when we return and
-      // fetch the onboarding status
     } catch (error) {
       console.error('Error connecting to Slack:', error);
       throw error;
@@ -152,7 +148,7 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
   
   fetchGithubUsers: async () => {
     try {
-      const { data } = await api.get('/github/users');
+      const { data } = await api.get<GitHubUser[]>('/github/users');
       return data;
     } catch (error) {
       console.error('Error fetching GitHub users:', error);
@@ -162,7 +158,7 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
   
   fetchSlackUsers: async () => {
     try {
-      const { data } = await api.get('/slack/users');
+      const { data } = await api.get<SlackUser[]>('/slack/users');
       return data;
     } catch (error) {
       console.error('Error fetching Slack users:', error);
@@ -172,7 +168,7 @@ export const useOnboarding = create<OnboardingStore>((set, get) => ({
   
   fetchGithubRepositories: async () => {
     try {
-      const { data } = await api.get('/github/repositories');
+      const { data } = await api.get<Repository[]>('/github/repositories');
       return data;
     } catch (error) {
       console.error('Error fetching GitHub repositories:', error);
