@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { CheckCircle2, GitPullRequest, Slack, ArrowRightLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-const AuthSuccess: React.FC = () => {
+const GitHubAuthSuccess: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-slate-50 dark:from-gray-900 dark:to-gray-800 p-4 relative overflow-hidden">
       {/* Decorative elements contained within the viewport */}
@@ -99,4 +99,4 @@ const AuthSuccess: React.FC = () => {
   );
 };
 
-export default AuthSuccess;
+export default GitHubAuthSuccess;

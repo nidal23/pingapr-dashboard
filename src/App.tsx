@@ -9,7 +9,12 @@ import Onboarding from "./pages/Onboarding";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
-import AuthSuccess from "./pages/auth/AuthSuccess";
+import GitHubAuthSuccess from "./pages/auth/GitHubAuthSuccess";
+import SlackAuthSuccess from "./pages/auth/SlackAuthSuccess";
+import StandupDashboard from "./pages/dashboard/StandupDashboard";
+import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard";
+import CollaborationDashboard from "./pages/dashboard/CollaborationDashboard";
+import { ThemeProvider } from "./components/theme/ThemeProvider";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +30,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => (
+  <ThemeProvider defaultTheme="system" storageKey="pingapr-theme">
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Sonner />
@@ -34,8 +40,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/auth-success" element={<AuthSuccess />} />
-          
+          <Route path="/auth-success/github" element={<GitHubAuthSuccess />} />
+          <Route path="/auth-success/slack" element={<SlackAuthSuccess />} />          
+
           {/* Protected routes */}
           <Route path="/onboarding" element={
             <ProtectedRoute>
@@ -49,10 +56,14 @@ const App = () => (
           } />
           
           <Route path="*" element={<NotFound />} />
+          <Route path="/standup" element={<StandupDashboard />} />
+            <Route path="/analytics" element={<AnalyticsDashboard />} />
+            <Route path="/collaboration" element={<CollaborationDashboard />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
