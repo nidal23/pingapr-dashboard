@@ -470,8 +470,8 @@ const CollaborationDashboard = () => {
                                 <div 
                                   className={cn(
                                     "h-full",
-                                    member.avg_review_time_hours < 12 ? "bg-success" : 
-                                    member.avg_review_time_hours < 24 ? "bg-warning" : "bg-danger"
+                                    member.avg_review_time_hours < 12 ? "bg-emerald-500" : 
+                                    member.avg_review_time_hours < 24 ? "bg-amber-500" : "bg-red-500"
                                   )}
                                   style={{ 
                                     width: `${Math.min((member.avg_review_time_hours / 48) * 100, 100)}%` 

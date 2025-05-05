@@ -45,8 +45,8 @@ const COLORS = {
   opened: "#10b981", // green
   merged: "#6E41E2", // purple
   closed: "#94a3b8", // gray
-  github: "#6E41E2", // purple for GitHub
-  slack: "#4A154B", // darker purple for Slack
+  github: "#9a90b3", // purple for GitHub
+  slack: "#bb3bbd", // darker purple for Slack
 };
 
 const AnalyticsDashboard = () => {
