@@ -157,7 +157,7 @@ const CollaborationDashboard = () => {
     );
   }
 
-  const { reviewerNetwork, teamMembers, teamEngagement } = data;
+  const { reviewerNetwork, teamMembers } = data;
 
   // Filter members by search query
   const filteredMembers = teamMembers.filter(member => 
@@ -227,25 +227,6 @@ const CollaborationDashboard = () => {
         },
       },
     },
-  };
-
-  // Team engagement data for bar chart
-  const teamEngagementData = {
-    labels: teamEngagement.slice(0, 10).map(member => member.name.split(" ")[0]),
-    datasets: [
-      {
-        label: "GitHub Comments",
-        data: teamEngagement.slice(0, 10).map(member => member.github_comments),
-        backgroundColor: COLORS.github,
-        borderRadius: 4,
-      },
-      {
-        label: "Slack Messages",
-        data: teamEngagement.slice(0, 10).map(member => member.slack_comments),
-        backgroundColor: COLORS.slack,
-        borderRadius: 4,
-      }
-    ],
   };
 
   // Calculate review balance categories
@@ -358,7 +339,6 @@ const CollaborationDashboard = () => {
           <TabsList className="mb-4">
             <TabsTrigger value="team-activity">Team Activity</TabsTrigger>
             <TabsTrigger value="review-network">Review Network</TabsTrigger>
-            <TabsTrigger value="platform-usage">Platform Usage</TabsTrigger>
           </TabsList>
           
           <TabsContent value="team-activity">
@@ -575,93 +555,6 @@ const CollaborationDashboard = () => {
                             : "Consider rotating reviewers more to spread knowledge."}
                         </p>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="platform-usage">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Platform Engagement by Team Member</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <Bar 
-                      data={teamEngagementData} 
-                      options={{
-                        ...chartOptions,
-                        indexAxis: 'y' as const,
-                      }} 
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold">Communication Channel Preferences</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {teamEngagement.map((member) => {
-                      const totalComments = member.github_comments + member.slack_comments;
-                      const githubPercentage = totalComments ? (member.github_comments / totalComments) * 100 : 0;
-                      const slackPercentage = totalComments ? (member.slack_comments / totalComments) * 100 : 0;
-                      
-                      return (
-                        <div key={member.name} className="relative">
-                          <div className="flex justify-between items-center mb-1">
-                            <div className="flex items-center">
-                              <Avatar className="h-6 w-6 mr-2">
-                                <AvatarImage src={member.avatar_url} />
-                                <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                              </Avatar>
-                              <span className="text-sm font-medium">{member.name}</span>
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              {totalComments} comments
-                            </span>
-                          </div>
-                          
-                          <div className="w-full h-2 bg-muted rounded-full overflow-hidden flex">
-                            <div 
-                              className="h-full"
-                              style={{ width: `${githubPercentage}%`, backgroundColor: COLORS.github }}
-                            ></div>
-                            <div 
-                              className="h-full"
-                              style={{ width: `${slackPercentage}%`, backgroundColor: COLORS.slack }}
-                            ></div>
-                          </div>
-                          
-                          <div className="flex justify-between mt-1">
-                            <span className="text-xs">
-                              GitHub: {githubPercentage.toFixed(0)}%
-                            </span>
-                            <span className="text-xs">
-                              Slack: {slackPercentage.toFixed(0)}%
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                    
-                    <div className="mt-8 bg-muted/30 p-4 rounded-md">
-                      <h3 className="text-sm font-medium mb-2">Platform Usage Insights</h3>
-                      <ul className="text-xs text-muted-foreground space-y-2">
-                        <li className="flex items-start">
-                          <div className="h-4 w-4 rounded-full mr-2 flex-shrink-0 mt-0.5" style={{ backgroundColor: COLORS.github }}></div>
-                          <span>GitHub is primarily used for technical discussions and code reviews.</span>
-                        </li>
-                        <li className="flex items-start">
-                          <div className="h-4 w-4 rounded-full mr-2 flex-shrink-0 mt-0.5" style={{ backgroundColor: COLORS.slack }}></div>
-                          <span>Slack is used for quick feedback and non-technical discussions about PRs.</span>
-                        </li>
-                      </ul>
                     </div>
                   </div>
                 </CardContent>

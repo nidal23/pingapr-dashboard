@@ -156,7 +156,7 @@ const Dashboard = () => {
             value={prStatusCounts.open_prs}
             description="Awaiting review or merge"
             icon={<GitPullRequest className="h-5 w-5" />}
-            trend={{ direction: "up", value: "12% from last week" }}
+            // trend={{ direction: "up", value: "12% from last week" }}
           />
           <StatCard
             title="Merged PRs"
