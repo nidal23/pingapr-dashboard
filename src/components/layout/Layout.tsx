@@ -75,7 +75,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Sidebar - Desktop */}
-      <div className="hidden md:flex md:flex-shrink-0">
+      <div className="hidden md:flex md:flex-shrink-0 bg-sidebar">
         <div className="flex flex-col w-64 border-r">
           {/* Logo */}
           <div className="h-16 flex items-center px-6 border-b">
@@ -96,7 +96,7 @@ const Layout = ({ children }: LayoutProps) => {
                     flex items-center px-3 py-2 text-sm font-medium rounded-md
                     ${location.pathname === item.path 
                       ? 'bg-primary/10 text-primary' 
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      : 'text-muted-foreground hover:bg-secondary-foreground hover:text-secondary'
                     }
                   `}
                 >
@@ -133,7 +133,7 @@ const Layout = ({ children }: LayoutProps) => {
       {/* Main content area */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top header */}
-        <div className="border-b h-16 flex items-center justify-between px-4">
+        <div className="border-b bg-sidebar h-16 flex items-center justify-between px-4">
           {/* Mobile menu button */}
           <button
             type="button"
@@ -154,7 +154,7 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
 
           {/* Theme toggle & user menu (mobile) */}
-          <div className="flex items-center">
+          <div className="flex items-center bg-sidebar">
             <ThemeToggle />
             <div className="ml-4 md:hidden">
               <Avatar>
@@ -182,7 +182,7 @@ const Layout = ({ children }: LayoutProps) => {
                       flex items-center px-3 py-2 text-base font-medium rounded-md
                       ${location.pathname === item.path 
                         ? 'bg-primary/10 text-primary' 
-                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                        : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'
                       }
                     `}
                   >
@@ -193,7 +193,7 @@ const Layout = ({ children }: LayoutProps) => {
 
                 {/* Mobile logout */}
                 <button
-                  className="w-full flex items-center px-3 py-2 text-base font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  className="w-full flex items-center px-3 py-2 text-base font-medium rounded-md text-muted-foreground hover:bg-secondary hover:text-secondary-foreground"
                   onClick={handleLogout}
                 >
                   <LogOut className="w-5 h-5 mr-3" />
