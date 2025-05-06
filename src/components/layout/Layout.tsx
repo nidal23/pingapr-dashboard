@@ -96,7 +96,7 @@ const Layout = ({ children }: LayoutProps) => {
                     flex items-center px-3 py-2 text-sm font-medium rounded-md
                     ${location.pathname === item.path 
                       ? 'bg-primary/10 text-primary' 
-                      : 'text-muted-foreground hover:bg-secondary-foreground hover:text-secondary'
+                      : 'text-muted-foreground hover:text-primary'
                     }
                   `}
                 >
