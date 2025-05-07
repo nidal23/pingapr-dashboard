@@ -41,7 +41,7 @@ const StatCard = ({
                 ? value.toFixed(1)
                 : value}
             </div>
-            {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+            {description && <p className="text-xs text-secondary mt-1">{description}</p>}
           </div>
           {trend && (
             <div
