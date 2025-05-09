@@ -1,3 +1,4 @@
+// src/App.tsx
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ import SlackAuthSuccess from "./pages/auth/SlackAuthSuccess";
 import StandupDashboard from "./pages/dashboard/StandupDashboard";
 import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard";
 import CollaborationDashboard from "./pages/dashboard/CollaborationDashboard";
+import TeamsPage from "./pages/dashboard/TeamsPage";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 
 const queryClient = new QueryClient();
@@ -31,38 +33,60 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => (
   <ThemeProvider defaultTheme="system" storageKey="pingapr-theme">
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/auth-success/github" element={<GitHubAuthSuccess />} />
-          <Route path="/auth-success/slack" element={<SlackAuthSuccess />} />          
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/auth-success/github" element={<GitHubAuthSuccess />} />
+            <Route path="/auth-success/slack" element={<SlackAuthSuccess />} />          
 
-          {/* Protected routes */}
-          <Route path="/onboarding" element={
-            <ProtectedRoute>
-              <Onboarding />
-            </ProtectedRoute>
-          } />
-          <Route path="/dashboard/*" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="*" element={<NotFound />} />
-          <Route path="/standup" element={<StandupDashboard />} />
-            <Route path="/analytics" element={<AnalyticsDashboard />} />
-            <Route path="/collaboration" element={<CollaborationDashboard />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+            {/* Protected routes */}
+            <Route path="/onboarding" element={
+              <ProtectedRoute>
+                <Onboarding />
+              </ProtectedRoute>
+            } />
+
+            {/* Main dashboard route */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Specific dashboard pages */}
+            <Route path="/standup" element={
+              <ProtectedRoute>
+                <StandupDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <AnalyticsDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/collaboration" element={
+              <ProtectedRoute>
+                <CollaborationDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/team" element={
+              <ProtectedRoute>
+                <TeamsPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* 404 route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   </ThemeProvider>
 );
 

@@ -15,6 +15,8 @@ import { AlertCircle, Search } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TimePeriod } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
+import { useTeamsFilter } from '@/hooks/use-teams-filter';
+import { Users } from 'lucide-react';
 
 // Chart.js imports for visualizations
 import {
@@ -61,9 +63,11 @@ const CollaborationDashboard = () => {
     error,
     selectedTimePeriod,
     selectedRepository,
+    selectedTeamId,
     fetchCollaborationData, 
     setTimePeriod, 
-    setRepository
+    setRepository,
+    setTeamId
   } = useCollaborationStore();
 
   const { 
@@ -71,6 +75,12 @@ const CollaborationDashboard = () => {
     isLoading: reposLoading, 
     fetchRepositories 
   } = useRepositoryStore();
+
+
+  const { 
+  teams,
+  isLoading: teamsLoading 
+} = useTeamsFilter();
 
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -328,6 +338,27 @@ const CollaborationDashboard = () => {
                 {repositories.map((repo) => (
                   <SelectItem key={repo.id} value={repo.id}>
                     {repo.github_repo_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select 
+              value={selectedTeamId || "all"} 
+              onValueChange={(value) => setTeamId(value === "all" ? '' : value)}
+              disabled={teamsLoading || teams.length === 0}
+            >
+              <SelectTrigger className="w-44">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <SelectValue placeholder="All teams" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All teams</SelectItem>
+                {teams.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>
+                    {team.name}
                   </SelectItem>
                 ))}
               </SelectContent>

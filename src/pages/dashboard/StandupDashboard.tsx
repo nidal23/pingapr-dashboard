@@ -16,6 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PullRequestTable from "@/components/dashboard/PullRequestTable";
 import StatCard from "@/components/dashboard/StatCard";
 import { TimePeriod } from "@/types/dashboard";
+import { useTeamsFilter } from '@/hooks/use-teams-filter';
+import { Users } from 'lucide-react';
 
 const StandupDashboard = () => {
   const { 
@@ -24,14 +26,22 @@ const StandupDashboard = () => {
     error,
     selectedTimePeriod,
     selectedRepository,
+    selectedTeamId,
     focusMode,
     fetchStandupData, 
     setTimePeriod, 
     setRepository,
+    setTeamId,
     toggleFocusMode,
     addDiscussionPoint,
     removeDiscussionPoint
   } = useStandupStore();
+
+
+  const { 
+  teams,
+  isLoading: teamsLoading 
+} = useTeamsFilter();
 
   const { 
     repositories, 
@@ -162,6 +172,28 @@ const StandupDashboard = () => {
                 {repositories.map((repo) => (
                   <SelectItem key={repo.id} value={repo.id}>
                     {repo.github_repo_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Add team selector */}
+            <Select 
+              value={selectedTeamId || "all"} 
+              onValueChange={(value) => setTeamId(value === "all" ? '' : value)}
+              disabled={teamsLoading || teams.length === 0}
+            >
+              <SelectTrigger className="w-full md:w-[200px]">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <SelectValue placeholder="All teams" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All teams</SelectItem>
+                {teams.map((team) => (
+                  <SelectItem key={team.id} value={team.id}>
+                    {team.name}
                   </SelectItem>
                 ))}
               </SelectContent>

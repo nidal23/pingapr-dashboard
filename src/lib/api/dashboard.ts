@@ -7,7 +7,8 @@ import {
   CollaborationDashboardData,
   TimePeriod,
   RepositoryFilter,
-  DiscussionPoint
+  DiscussionPoint,
+  TeamId
 } from '@/types/dashboard';
 
 export const dashboardApi = {
@@ -20,11 +21,13 @@ export const dashboardApi = {
   // Standup Dashboard API
   fetchStandupData: async (
     timePeriod: TimePeriod = 'daily',
-    repoId: RepositoryFilter = null
+    repoId: RepositoryFilter = null,
+    teamId: string = ''
   ): Promise<StandupDashboardData> => {
     const params = new URLSearchParams();
     if (timePeriod) params.append('period', timePeriod);
     if (repoId) params.append('repoId', repoId);
+    if (teamId) params.append('teamId', teamId);
 
     const { data } = await api.get(`/dashboard/standup?${params.toString()}`);
     return data;
@@ -41,25 +44,30 @@ export const dashboardApi = {
 
   // PR Analytics Dashboard API
   fetchAnalyticsData: async (
-    timePeriod: TimePeriod = 'monthly',
-    repoId: RepositoryFilter = null
-  ): Promise<AnalyticsDashboardData> => {
-    const params = new URLSearchParams();
-    if (timePeriod) params.append('period', timePeriod);
-    if (repoId) params.append('repoId', repoId);
+  timePeriod: TimePeriod = 'monthly',
+  repoId: RepositoryFilter = null,
+  teamId: string | null = null
+): Promise<AnalyticsDashboardData> => {
+  const params = new URLSearchParams();
+  if (timePeriod) params.append('period', timePeriod);
+  if (repoId) params.append('repoId', repoId);
+  if (teamId) params.append('teamId', teamId);
 
-    const { data } = await api.get(`/dashboard/analytics?${params.toString()}`);
-    return data;
-  },
+  const { data } = await api.get(`/dashboard/analytics?${params.toString()}`);
+  return data;
+},
+
 
   // Team Collaboration Dashboard API
   fetchCollaborationData: async (
     timePeriod: TimePeriod = 'monthly',
-    repoId: RepositoryFilter = null
+    repoId: RepositoryFilter = null,
+    teamId: TeamId = ''
   ): Promise<CollaborationDashboardData> => {
     const params = new URLSearchParams();
     if (timePeriod) params.append('period', timePeriod);
     if (repoId) params.append('repoId', repoId);
+    if(teamId) params.append('teamId', teamId);
 
     const { data } = await api.get(`/dashboard/collaboration?${params.toString()}`);
     return data;
