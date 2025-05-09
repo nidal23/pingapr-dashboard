@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, GitMerge, GitPullRequest, Clock } from "lucide-react";
 import { TimePeriod } from "@/types/dashboard";
+import { useTeamsFilter } from '@/hooks/use-teams-filter';
+import { Users } from 'lucide-react';
 
 // Chart.js imports for visualizations
 import {
@@ -56,10 +58,18 @@ const AnalyticsDashboard = () => {
     error,
     selectedTimePeriod,
     selectedRepository,
+    selectedTeamId,
     fetchAnalyticsData, 
     setTimePeriod, 
-    setRepository
+    setRepository,
+    setTeamId
   } = useAnalyticsStore();
+
+
+  const { 
+  teams,
+  isLoading: teamsLoading 
+} = useTeamsFilter();
 
   const { 
     repositories, 
@@ -394,37 +404,59 @@ const AnalyticsDashboard = () => {
             <p className="text-gray-500">Detailed metrics about PR activity and team performance</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Select 
-              value={selectedTimePeriod} 
-              onValueChange={(value) => setTimePeriod(value as TimePeriod)}
-            >
-              <SelectTrigger className="w-36">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-              </SelectContent>
-            </Select>
+          <Select 
+            value={selectedTimePeriod} 
+            onValueChange={(value) => setTimePeriod(value as TimePeriod)}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+            </SelectContent>
+          </Select>
 
-            <Select 
-              value={selectedRepository || "all"} 
-              onValueChange={(value) => setRepository(value === "all" ? null : value)}
-            >
-              <SelectTrigger className="w-44">
-                <SelectValue placeholder="All repositories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All repositories</SelectItem>
-                {repositories.map((repo) => (
-                  <SelectItem key={repo.id} value={repo.id}>
-                    {repo.github_repo_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select 
+            value={selectedRepository || "all"} 
+            onValueChange={(value) => setRepository(value === "all" ? null : value)}
+          >
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="All repositories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All repositories</SelectItem>
+              {repositories.map((repo) => (
+                <SelectItem key={repo.id} value={repo.id}>
+                  {repo.github_repo_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Add team selector */}
+          <Select 
+            value={selectedTeamId || "all"} 
+            onValueChange={(value) => setTeamId(value === "all" ? '' : value)}
+            disabled={teamsLoading || teams.length === 0}
+          >
+            <SelectTrigger className="w-44">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                <SelectValue placeholder="All teams" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All teams</SelectItem>
+              {teams.map((team) => (
+                <SelectItem key={team.id} value={team.id}>
+                  {team.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

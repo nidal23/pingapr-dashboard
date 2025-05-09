@@ -131,3 +131,4 @@ export interface CollaborationDashboardData {
 
 export type TimePeriod = 'daily' | 'weekly' | 'monthly';
 export type RepositoryFilter = string | null; // repo ID or null for all
+export type TeamId = string | '';

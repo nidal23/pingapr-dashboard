@@ -5,6 +5,7 @@ import {
   StandupDashboardData, 
   TimePeriod, 
   RepositoryFilter,
+  TeamId,
   DiscussionPoint
 } from '@/types/dashboard';
 
@@ -14,6 +15,7 @@ interface StandupStore {
   error: string | null;
   data: StandupDashboardData | null;
   selectedTimePeriod: TimePeriod;
+  selectedTeamId: TeamId;
   selectedRepository: RepositoryFilter;
   focusMode: boolean;
   
@@ -21,6 +23,7 @@ interface StandupStore {
   fetchStandupData: () => Promise<void>;
   setTimePeriod: (period: TimePeriod) => void;
   setRepository: (repoId: RepositoryFilter) => void;
+  setTeamId: (teamId: TeamId) => void;
   toggleFocusMode: () => void;
   addDiscussionPoint: (point: Omit<DiscussionPoint, 'id' | 'created_at'>) => Promise<void>;
   removeDiscussionPoint: (id: string) => Promise<void>;
@@ -33,16 +36,17 @@ export const useStandupStore = create<StandupStore>((set, get) => ({
   error: null,
   data: null,
   selectedTimePeriod: 'daily',
+  selectedTeamId: '',
   selectedRepository: null,
   focusMode: false,
   
   // Actions
   fetchStandupData: async () => {
-    const { selectedTimePeriod, selectedRepository } = get();
+    const { selectedTimePeriod, selectedRepository, selectedTeamId } = get();
     set({ isLoading: true, error: null });
     
     try {
-      const data = await dashboardApi.fetchStandupData(selectedTimePeriod, selectedRepository);
+      const data = await dashboardApi.fetchStandupData(selectedTimePeriod, selectedRepository, selectedTeamId);
       set({ data, isLoading: false });
     } catch (err) {
       console.error('Error fetching standup data:', err);
@@ -55,6 +59,12 @@ export const useStandupStore = create<StandupStore>((set, get) => ({
   
   setTimePeriod: (period) => {
     set({ selectedTimePeriod: period });
+    get().fetchStandupData();
+  },
+
+
+  setTeamId: (teamId) => {
+    set({ selectedTeamId: teamId });
     get().fetchStandupData();
   },
   
