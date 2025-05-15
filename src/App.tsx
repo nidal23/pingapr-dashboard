@@ -17,6 +17,7 @@ import AnalyticsDashboard from "./pages/dashboard/AnalyticsDashboard";
 import CollaborationDashboard from "./pages/dashboard/CollaborationDashboard";
 import TeamsPage from "./pages/dashboard/TeamsPage";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
+import Settings from "./pages/dashboard/Settings";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,11 @@ const App = () => (
             <Route path="/team" element={
               <ProtectedRoute>
                 <TeamsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             } />
             

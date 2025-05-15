@@ -1,16 +1,16 @@
 // src/pages/dashboard/StandupDashboard.tsx
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useStandupStore } from "@/lib/stores/standupStore";
 import { useRepositoryStore } from "@/lib/stores/repositoryStore";
 import Layout from "@/components/layout/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
-import { AlertCircle, Plus, Trash2, Clock, GitMerge, GitPullRequest, XCircle } from "lucide-react";
+import { AlertCircle, Clock, GitMerge, GitPullRequest } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import PullRequestTable from "@/components/dashboard/PullRequestTable";
@@ -33,8 +33,8 @@ const StandupDashboard = () => {
     setRepository,
     setTeamId,
     toggleFocusMode,
-    addDiscussionPoint,
-    removeDiscussionPoint
+    // addDiscussionPoint,
+    // removeDiscussionPoint
   } = useStandupStore();
 
 
@@ -49,22 +49,22 @@ const StandupDashboard = () => {
     fetchRepositories 
   } = useRepositoryStore();
 
-  const [newPoint, setNewPoint] = useState({ text: "", type: "discussion" as const });
+  // const [newPoint, setNewPoint] = useState({ text: "", type: "discussion" as const });
 
   useEffect(() => {
     fetchStandupData();
     fetchRepositories();
   }, [fetchStandupData, fetchRepositories]);
 
-  const handleAddDiscussionPoint = () => {
-    if (newPoint.text.trim()) {
-      addDiscussionPoint({
-        text: newPoint.text,
-        type: newPoint.type
-      });
-      setNewPoint({ text: "", type: "discussion" });
-    }
-  };
+  // const handleAddDiscussionPoint = () => {
+  //   if (newPoint.text.trim()) {
+  //     addDiscussionPoint({
+  //       text: newPoint.text,
+  //       type: newPoint.type
+  //     });
+  //     setNewPoint({ text: "", type: "discussion" });
+  //   }
+  // };
 
   if (isLoading || reposLoading) {
     return (
@@ -137,7 +137,7 @@ const StandupDashboard = () => {
     );
   }
 
-  const { stats, activePRs, discussionPoints } = data;
+  const { stats, activePRs } = data;
 
   return (
     <Layout>
@@ -256,8 +256,8 @@ const StandupDashboard = () => {
             </div>
           )}
         </div>
-
-        {!focusMode && (
+      </div>
+      {/* {!focusMode && (
           <div>
             <h2 className="text-lg font-semibold mb-4">Blockers & Discussion Points</h2>
             <Card>
@@ -332,8 +332,7 @@ const StandupDashboard = () => {
               </CardContent>
             </Card>
           </div>
-        )}
-      </div>
+        )} */}
     </Layout>
   );
 };
