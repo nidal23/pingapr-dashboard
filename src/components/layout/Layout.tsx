@@ -119,7 +119,7 @@ const Layout = ({ children }: LayoutProps) => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium">{user?.name}</p>
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="flex items-center text-xs text-muted-foreground px-0">
+                  <Button variant="destructive" size="sm" onClick={handleLogout} className="flex items-center text-xs px-2">
                     <LogOut className="w-3 h-3 mr-1" />
                     Logout
                   </Button>
@@ -134,34 +134,36 @@ const Layout = ({ children }: LayoutProps) => {
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top header */}
         <div className="border-b bg-sidebar h-16 flex items-center justify-between px-4">
-          {/* Mobile menu button */}
-          <button
-            type="button"
-            className="md:hidden p-2 rounded-md text-muted-foreground hover:text-primary focus:outline-none"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
+          <div className="flex items-center">
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-primary focus:outline-none"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
 
-          {/* Mobile logo */}
-          <div className="md:hidden flex items-center">
-            <GitPullRequest className="w-6 h-6 text-primary mr-2" />
-            <span className="text-xl font-bold">PingaPR</span>
+            {/* Mobile logo */}
+            <div className="md:hidden flex items-center">
+              <GitPullRequest className="w-6 h-6 text-primary mr-2" />
+              <span className="text-xl font-bold">PingaPR</span>
+            </div>
           </div>
 
-          {/* Theme toggle & user menu (mobile) */}
+          {/* Theme toggle & user menu (mobile) - Moved ThemeToggle to the right */}
           <div className="flex items-center bg-sidebar">
-            <ThemeToggle />
-            <div className="ml-4 md:hidden">
+            <div className="md:hidden mr-4">
               <Avatar>
                 <AvatarImage src={`https://i.pravatar.cc/150?u=${user?.email}`} alt={user?.name} />
                 <AvatarFallback>{user?.name?.[0]}</AvatarFallback>
               </Avatar>
             </div>
+            <ThemeToggle />
           </div>
         </div>
 
