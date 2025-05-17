@@ -1,5 +1,5 @@
 
-import { RecentPR } from "@/data/mockData";
+import { RecentPR } from "@/types/dashboard";
 import { 
   Table, 
   TableBody, 
@@ -52,7 +52,7 @@ const PullRequestTable = ({ pullRequests, showRepo = true }: PullRequestTablePro
                 <div className="flex items-center">
                   <Avatar className="h-6 w-6 mr-2">
                     <AvatarImage
-                      src={`https://i.pravatar.cc/150?u=${pr.author_username}`}
+                     src={pr.author_avatar}
                       alt={pr.author_name}
                     />
                     <AvatarFallback>{pr.author_name[0]}</AvatarFallback>
