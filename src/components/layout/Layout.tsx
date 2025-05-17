@@ -17,10 +17,41 @@ import {
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Toaster } from '@/components/ui/sonner';
+import { User } from '@/types/database';
 
 interface LayoutProps {
   children: ReactNode;
 }
+
+const getUserAvatar = (user: User | null) => {
+  // First try to use the avatar_url from the user
+  if (user?.avatar_url) {
+    return user.avatar_url;
+  }
+  
+  // Fallback to a GitHub-style avatar based on username
+  return `https://github.com/${user?.github_username || 'ghost'}.png`;
+};
+
+
+const getUserInitials = (user: User | null) => {
+  if (user?.name && user.name.trim()) {
+    // Get first letter of first and last name if available
+    const nameParts = user.name.trim().split(/\s+/);
+    if (nameParts.length > 1) {
+      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+    }
+    return user.name.charAt(0).toUpperCase();
+  }
+  
+  // Fallback to GitHub username initial
+  if (user?.github_username) {
+    return user.github_username.charAt(0).toUpperCase();
+  }
+  
+  // Ultimate fallback
+  return "U";
+};
 
 const Layout = ({ children }: LayoutProps) => {
   const { user, logout } = useAuth();
@@ -113,8 +144,8 @@ const Layout = ({ children }: LayoutProps) => {
               <div className="flex items-center">
                 <div>
                   <Avatar>
-                    <AvatarImage src={`https://i.pravatar.cc/150?u=${user?.email}`} alt={user?.name} />
-                    <AvatarFallback>{user?.name?.[0]}</AvatarFallback>
+                    <AvatarImage src={getUserAvatar(user)}/>
+                    <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
                   </Avatar>
                 </div>
                 <div className="ml-3">

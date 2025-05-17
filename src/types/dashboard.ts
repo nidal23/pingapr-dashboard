@@ -41,6 +41,7 @@ export interface RecentPR {
   author_name: string;
   author_username: string;
   reviewers: Reviewer[];
+  author_avatar: string;
 }
 
 export interface StandupStats {
