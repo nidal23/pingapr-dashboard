@@ -89,198 +89,213 @@ const UserMappingStep: React.FC<UserMappingStepProps> = ({
   );
 
   const handleAutoMap = async () => {
-    try {
-      setIsAutoMapping(true);
-      
-      // Auto-map users based on name or email similarity
-      const autoMappings = githubUsers.map(githubUser => {
-        // Try to match by name
-        let slackUser = slackUsers.find(
-          slackUser => (slackUser.name || '').toLowerCase() === (githubUser.name || '').toLowerCase()
-        );
-        
-        // If no match by name, try matching by email
-        if (!slackUser && githubUser.email) {
-          slackUser = slackUsers.find(
-            slackUser => (slackUser.email || '').toLowerCase() === githubUser.email?.toLowerCase()
-          );
-        }
-        
-        if (slackUser) {
-          return {
-            githubUsername: (githubUser.username || githubUser.login) as string,
-            slackUserId: slackUser.id,
-            isAdmin: false,
-            avatarUrl: githubUser.avatar_url || githubUser.avatarUrl
-          };
-        }
-        
-        return null;
-      }).filter(Boolean) as UserMapping[];
-      
-      // Preserve any existing admin mappings
-      const existingAdminMappings = userMappings.filter(mapping => mapping.isAdmin);
-      
-      // Combine existing admin mappings with new auto-mappings
-      const combinedMappings = [
-        ...existingAdminMappings,
-        ...autoMappings.filter(m => 
-          !existingAdminMappings.some(e => e.githubUsername === m.githubUsername)
-        )
-      ];
-      
-      // Save mappings
-      await updateUserMappings(combinedMappings);
-      toast.success(`Auto-mapped ${autoMappings.length} users`);
-    } catch (error) {
-      console.error('Error auto-mapping users:', error);
-      toast.error('Failed to auto-map users');
-    } finally {
-      setIsAutoMapping(false);
-    }
-  };
-
-  const toggleAdmin = async (githubUsername: string) => {
-    try {
-      // Check if we're trying to have more than 2 admins
-      const currentAdmins = userMappings.filter(m => m.isAdmin);
-      const isCurrentlyAdmin = userMappings.find(m => m.githubUsername === githubUsername)?.isAdmin || false;
-      
-      if (currentAdmins.length >= 2 && !isCurrentlyAdmin) {
-        toast.error("You can only have up to 2 admins per organization");
-        return;
-      }
-      
-      const updatedMappings = userMappings.map(mapping => {
-        if (mapping.githubUsername === githubUsername) {
-          return { ...mapping, isAdmin: !mapping.isAdmin };
-        }
-        return mapping;
-      });
-      
-      await updateUserMappings(updatedMappings);
-    } catch (error) {
-      console.error('Error toggling admin status:', error);
-      toast.error('Failed to update admin status');
-    }
-  };
-
-  const assignSlackUser = async (githubUsername: string, slackUserId: string) => {
-    try {
-      setIsSaving(true);
-      // Check if mapping already exists
-      const existingMappingIndex = userMappings.findIndex(
-        mapping => mapping.githubUsername === githubUsername
+  try {
+    setIsAutoMapping(true);
+    
+    // Auto-map users based on name or email similarity
+    const autoMappings = githubUsers.map(githubUser => {
+      // Try to match by name
+      let slackUser = slackUsers.find(
+        slackUser => (slackUser.name || '').toLowerCase() === (githubUser.name || '').toLowerCase()
       );
       
-      let updatedMappings;
-      
-      if (existingMappingIndex >= 0) {
-        // Update existing mapping
-        updatedMappings = [...userMappings];
-        updatedMappings[existingMappingIndex].slackUserId = slackUserId;
-      } else {
-        // Create new mapping
-        const githubUser = githubUsers.find(user => 
-          (user.username || user.login) === githubUsername
+      // If no match by name, try matching by email
+      if (!slackUser && githubUser.email) {
+        slackUser = slackUsers.find(
+          slackUser => (slackUser.email || '').toLowerCase() === githubUser.email?.toLowerCase()
         );
-        
-        if (githubUser) {
-          updatedMappings = [
-            ...userMappings,
-            {
-              githubUsername,
-              slackUserId,
-              isAdmin: false, // Default to non-admin for new mappings
-              avatarUrl: githubUser.avatar_url || githubUser.avatarUrl
-            }
-          ];
-        } else {
-          setIsSaving(false);
-          return; // Can't create mapping without GitHub user
-        }
       }
       
-      await updateUserMappings(updatedMappings);
-      setIsSaving(false);
-    } catch (error) {
-      console.error('Error assigning Slack user:', error);
-      toast.error('Failed to assign Slack user');
-      setIsSaving(false);
-    }
-  };
+      if (slackUser) {
+        return {
+          githubUsername: (githubUser.username || githubUser.login) as string,
+          slackUserId: slackUser.id,
+          isAdmin: false,
+          avatarUrl: githubUser.avatar_url || githubUser.avatarUrl // Ensure avatar URL is included
+        };
+      }
+      
+      return null;
+    }).filter(Boolean) as UserMapping[];
+    
+    // Preserve any existing admin mappings
+    const existingAdminMappings = userMappings.filter(mapping => mapping.isAdmin);
+    
+    // Combine existing admin mappings with new auto-mappings
+    const combinedMappings = [
+      ...existingAdminMappings,
+      ...autoMappings.filter(m => 
+        !existingAdminMappings.some(e => e.githubUsername === m.githubUsername)
+      )
+    ];
+    
+    // Save mappings
+    await updateUserMappings(combinedMappings);
+    toast.success(`Auto-mapped ${autoMappings.length} users`);
+  } catch (error) {
+    console.error('Error auto-mapping users:', error);
+    toast.error('Failed to auto-map users');
+  } finally {
+    setIsAutoMapping(false);
+  }
+};
 
-  const handleSetSelfAsAdmin = async () => {
-    if (!selectedGithubUsername || !selectedSlackUserId) {
-      toast.error("Please select both your GitHub username and Slack account");
+// toggleAdmin function in UserMappingStep.tsx
+const toggleAdmin = async (githubUsername: string) => {
+  try {
+    // Check if we're trying to have more than 2 admins
+    const currentAdmins = userMappings.filter(m => m.isAdmin);
+    const isCurrentlyAdmin = userMappings.find(m => m.githubUsername === githubUsername)?.isAdmin || false;
+    
+    if (currentAdmins.length >= 2 && !isCurrentlyAdmin) {
+      toast.error("You can only have up to 2 admins per organization");
       return;
     }
     
-    try {
-      setIsSaving(true);
-      
-      // Create the mapping with admin status
+    // Update mappings, making sure to preserve avatarUrl
+    const updatedMappings = userMappings.map(mapping => {
+      if (mapping.githubUsername === githubUsername) {
+        return { 
+          ...mapping, 
+          isAdmin: !mapping.isAdmin 
+        };
+      }
+      return mapping;
+    });
+    
+    await updateUserMappings(updatedMappings);
+  } catch (error) {
+    console.error('Error toggling admin status:', error);
+    toast.error('Failed to update admin status');
+  }
+};
+
+const assignSlackUser = async (githubUsername: string, slackUserId: string) => {
+  try {
+    setIsSaving(true);
+    // Check if mapping already exists
+    const existingMappingIndex = userMappings.findIndex(
+      mapping => mapping.githubUsername === githubUsername
+    );
+    
+    let updatedMappings;
+    
+    if (existingMappingIndex >= 0) {
+      // Update existing mapping
+      updatedMappings = [...userMappings];
+      updatedMappings[existingMappingIndex].slackUserId = slackUserId;
+    } else {
+      // Create new mapping
       const githubUser = githubUsers.find(user => 
-        (user.username || user.login) === selectedGithubUsername
+        (user.username || user.login) === githubUsername
       );
       
-      if (!githubUser) {
+      if (githubUser) {
+        updatedMappings = [
+          ...userMappings,
+          {
+            githubUsername,
+            slackUserId,
+            isAdmin: false, // Default to non-admin for new mappings
+            avatarUrl: githubUser.avatar_url || githubUser.avatarUrl // Ensure we get the avatar URL
+          }
+        ];
+      } else {
         setIsSaving(false);
-        toast.error("GitHub user not found");
-        return;
+        return; // Can't create mapping without GitHub user
       }
-      
-      // Important: First update the current user's identities directly
-      try {
-        await api.post('/auth/update-identities', {
-          githubUsername: selectedGithubUsername,
-          slackUserId: selectedSlackUserId
-        });
-        
-        // Refresh the current user data
-        await fetchCurrentUser();
-        
-        // Create admin mapping
-        const adminMapping: UserMapping = {
-          githubUsername: selectedGithubUsername,
-          slackUserId: selectedSlackUserId,
-          isAdmin: true,
-          avatarUrl: githubUser.avatar_url || githubUser.avatarUrl
-        };
-        
-        // Make sure to update or add this mapping to the existing mappings
-        const existingIndex = userMappings.findIndex(m => m.githubUsername === selectedGithubUsername);
-        let newMappings;
-        
-        if (existingIndex >= 0) {
-          newMappings = [...userMappings];
-          newMappings[existingIndex] = adminMapping;
-        } else {
-          newMappings = [...userMappings, adminMapping];
-        }
-        
-        // Now update the mappings
-        await updateUserMappings(newMappings);
-        
-        setIdentifyingSelf(false);
-        toast.success("You've been set as an admin");
-      } catch (error: any) {
-        console.error('Error setting admin identity:', error);
-        
-        if (error.response && error.response.data && error.response.data.error) {
-          toast.error(error.response.data.error);
-        } else {
-          toast.error("Failed to set admin identity");
-        }
-      }
-      
-      setIsSaving(false);
-    } catch (error) {
-      console.error('Error in handleSetSelfAsAdmin:', error);
-      toast.error('An unexpected error occurred');
-      setIsSaving(false);
     }
-  };
+    
+    await updateUserMappings(updatedMappings);
+    setIsSaving(false);
+  } catch (error) {
+    console.error('Error assigning Slack user:', error);
+    toast.error('Failed to assign Slack user');
+    setIsSaving(false);
+  }
+};
+
+// Refined handleSetSelfAsAdmin function in UserMappingStep.tsx
+const handleSetSelfAsAdmin = async () => {
+  if (!selectedGithubUsername || !selectedSlackUserId) {
+    toast.error("Please select both your GitHub username and Slack account");
+    return;
+  }
+  
+  try {
+    setIsSaving(true);
+    
+    // Get the GitHub user object from our list
+    const githubUser = githubUsers.find(user => 
+      (user.username || user.login) === selectedGithubUsername
+    );
+    
+    if (!githubUser) {
+      setIsSaving(false);
+      toast.error("GitHub user not found");
+      return;
+    }
+    
+    // Get avatar URL from GitHub user
+    const avatarUrl = githubUser.avatar_url || githubUser.avatarUrl;
+    
+    // Create the request payload - only include avatarUrl if it exists
+    const payload: {
+      githubUsername: string;
+      slackUserId: string;
+      avatarUrl?: string;
+    } = {
+      githubUsername: selectedGithubUsername,
+      slackUserId: selectedSlackUserId
+    };
+    
+    // Only add avatarUrl if it exists
+    if (avatarUrl) {
+      payload.avatarUrl = avatarUrl;
+    }
+    
+    // Make the API call with the payload
+    await api.post('/auth/update-identities', payload);
+    
+    // Refresh the current user data
+    await fetchCurrentUser();
+    
+    // Create admin mapping
+    const adminMapping: UserMapping = {
+      githubUsername: selectedGithubUsername,
+      slackUserId: selectedSlackUserId,
+      isAdmin: true,
+      avatarUrl: avatarUrl
+    };
+    
+    // Make sure to update or add this mapping to the existing mappings
+    const existingIndex = userMappings.findIndex(m => m.githubUsername === selectedGithubUsername);
+    let newMappings;
+    
+    if (existingIndex >= 0) {
+      newMappings = [...userMappings];
+      newMappings[existingIndex] = adminMapping;
+    } else {
+      newMappings = [...userMappings, adminMapping];
+    }
+    
+    // Now update the mappings
+    await updateUserMappings(newMappings);
+    
+    setIdentifyingSelf(false);
+    toast.success("You've been set as an admin");
+  } catch (error: any) {
+    console.error('Error setting admin identity:', error);
+    
+    if (error.response && error.response.data && error.response.data.error) {
+      toast.error(error.response.data.error);
+    } else {
+      toast.error("Failed to set admin identity");
+    }
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const getGithubUsername = (user: GitHubUser): string => {
     return (user.username || user.login) as string;
