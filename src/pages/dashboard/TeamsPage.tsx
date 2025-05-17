@@ -1,11 +1,10 @@
-// src/pages/dashboard/TeamsPage.tsx
-import React, { useEffect, useState } from "react";
+// Updated TeamsPage.tsx with proper avatar handling
+import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertCircle, Check, Edit, Plus, Save, Trash2, User, Users, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,6 +14,37 @@ import { useTeamsStore } from "@/lib/stores/teamsStore";
 import { useAuth } from "@/lib/stores/authStore";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { Team, TeamMember } from "@/types/teams";
+// Helper function to get avatar for a user
+const getUserAvatar = (user: TeamMember) => {
+  // First try to use the avatar_url from the user
+  if (user.avatar_url) {
+    return user.avatar_url;
+  }
+  
+  // Fallback to a GitHub-style avatar based on username
+  return `https://github.com/${user.github_username || 'ghost'}.png`;
+};
+
+// Helper function to get initials for the avatar fallback
+const getUserInitials = (user: TeamMember) => {
+  if (user.name && user.name.trim()) {
+    // Get first letter of first and last name if available
+    const nameParts = user.name.trim().split(/\s+/);
+    if (nameParts.length > 1) {
+      return `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`.toUpperCase();
+    }
+    return user.name.charAt(0).toUpperCase();
+  }
+  
+  // Fallback to GitHub username initial
+  if (user.github_username) {
+    return user.github_username.charAt(0).toUpperCase();
+  }
+  
+  // Ultimate fallback
+  return "U";
+};
 
 const TeamsPage = () => {
   const { user } = useAuth();
@@ -31,7 +61,7 @@ const TeamsPage = () => {
   } = useTeamsStore();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [activeTeam, setActiveTeam] = useState<any | null>(null);
+  const [activeTeam, setActiveTeam] = useState<Team | null>(null);
   const [teamName, setTeamName] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,7 +88,7 @@ const TeamsPage = () => {
   };
 
   // Open dialog for editing an existing team
-  const handleEditTeam = (team: any) => {
+  const handleEditTeam = (team: Team) => {
     setActiveTeam(team);
     setTeamName(team.name);
     setSelectedMembers(team.member_ids);
@@ -225,10 +255,10 @@ const TeamsPage = () => {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          {team.members?.slice(0, 5).map((member: any) => (
+                          {team.members?.slice(0, 5).map((member) => (
                             <Avatar key={member.id} className="h-8 w-8 border-2 border-background">
-                              <AvatarImage src={`https://i.pravatar.cc/150?u=${member.github_username}`} />
-                              <AvatarFallback>{member.name?.charAt(0) || member.github_username?.charAt(0)}</AvatarFallback>
+                              <AvatarImage src={getUserAvatar(member)} />
+                              <AvatarFallback>{getUserInitials(member)}</AvatarFallback>
                             </Avatar>
                           ))}
                           {(team.members?.length || 0) > 5 && (
@@ -268,8 +298,8 @@ const TeamsPage = () => {
                     <CardContent className="p-4">
                       <div className="flex items-center space-x-4">
                         <Avatar className="h-12 w-12">
-                          <AvatarImage src={`https://i.pravatar.cc/150?u=${member.github_username}`} />
-                          <AvatarFallback>{member.name?.charAt(0) || member.github_username?.charAt(0)}</AvatarFallback>
+                          <AvatarImage src={getUserAvatar(member)} />
+                          <AvatarFallback>{getUserInitials(member)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{member.name || "Unnamed user"}</p>
@@ -377,8 +407,8 @@ const TeamsPage = () => {
                       )}
                     </div>
                     <Avatar className="h-8 w-8 mr-2">
-                      <AvatarImage src={`https://i.pravatar.cc/150?u=${member.github_username}`} />
-                      <AvatarFallback>{member.name?.charAt(0) || member.github_username?.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={getUserAvatar(member)} />
+                      <AvatarFallback>{getUserInitials(member)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="text-sm font-medium">{member.name || "Unnamed user"}</p>

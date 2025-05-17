@@ -35,6 +35,7 @@ export interface Organization {
     github_refresh_token?: string;
     github_refresh_token_expires_at?: string; // ISO timestamp
     slack_user_token?:string;
+    avatar_url?: string;
     created_at: string; // ISO timestamp
     updated_at: string; // ISO timestamp
   }

@@ -20,6 +20,7 @@ export interface TeamMember {
   is_admin: boolean;
   github_connected: boolean;
   slack_connected: boolean;
+  avatar_url: string;
 }
 
 export interface CreateTeamInput {
