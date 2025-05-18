@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { api } from "@/lib/api";
+import axios from 'axios';
 
 interface UserMappingStepProps {
   onNext: () => void;
@@ -284,11 +285,16 @@ const handleSetSelfAsAdmin = async () => {
     
     setIdentifyingSelf(false);
     toast.success("You've been set as an admin");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error setting admin identity:', error);
     
-    if (error.response && error.response.data && error.response.data.error) {
-      toast.error(error.response.data.error);
+    if (axios.isAxiosError(error)) {
+      // This is now type-safe
+      if (error.response?.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error("Failed to set admin identity");
+      }
     } else {
       toast.error("Failed to set admin identity");
     }

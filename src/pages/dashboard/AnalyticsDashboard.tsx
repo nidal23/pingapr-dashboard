@@ -12,7 +12,7 @@ import { AlertCircle, GitMerge, GitPullRequest, Clock } from "lucide-react";
 import { TimePeriod } from "@/types/dashboard";
 import { useTeamsFilter } from '@/hooks/use-teams-filter';
 import { Users } from 'lucide-react';
-
+import { TooltipItem } from 'chart.js';
 // Chart.js imports for visualizations
 import {
   Chart as ChartJS,
@@ -382,7 +382,7 @@ const AnalyticsDashboard = () => {
         borderColor: 'rgba(255,255,255,0.1)',
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'pie'>) {
             return ` ${context.parsed}: ${context.raw} comments`;
           }
         }

@@ -9,6 +9,7 @@ import UserMappingStep from "@/components/onboarding/UserMappingStep";
 import ConfigurationStep from "@/components/onboarding/ConfigurationStep";
 import { useOnboarding } from "@/lib/stores/onboardingStore";
 import { toast } from "sonner";
+import { OnboardingStep } from "@/types/onboarding";
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const Onboarding: React.FC = () => {
         // Set appropriate step based on search parameters or OAuth callbacks
         if (step) {
           // If a specific step is requested in the URL, use that
-          setStep(step as any);
+          setStep(step as OnboardingStep);
         } else if (installation_id) {
           // If we're returning from GitHub OAuth flow
           setStep("github");

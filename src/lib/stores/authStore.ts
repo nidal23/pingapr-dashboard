@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { api } from '@/lib/api';
 import { User } from '@/types/database';
-
+import axios from 'axios';
 
 
 interface AuthState {
@@ -83,9 +83,8 @@ export const useAuth = create<AuthState>()(
             isAuthenticated: true
           });
         } catch (error) {
-          console.error('Failed to fetch current user:', error);
           // If unauthorized, log user out
-          if ((error as any)?.response?.status === 401) {
+          if (axios.isAxiosError(error) && error.response?.status === 401) {
             get().logout();
           }
         }
