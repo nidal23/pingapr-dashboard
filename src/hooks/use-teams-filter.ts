@@ -3,10 +3,6 @@ import { useState, useEffect } from 'react';
 import { useTeamsStore } from '@/lib/stores/teamsStore';
 import { Team } from '@/types/teams';
 
-interface UseTeamsFilterOptions {
-  includeAllOption?: boolean;
-}
-
 interface UseTeamsFilterResult {
   selectedTeam: Team | null;
   teams: Team[];
@@ -19,8 +15,7 @@ interface UseTeamsFilterResult {
 /**
  * Custom hook for filtering data by team
  */
-export function useTeamsFilter(options: UseTeamsFilterOptions = {}): UseTeamsFilterResult {
-  const { includeAllOption = true } = options;
+export function useTeamsFilter(): UseTeamsFilterResult {
   const { teams: storeTeams, isLoading, fetchTeams } = useTeamsStore();
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
 
@@ -43,7 +38,8 @@ export function useTeamsFilter(options: UseTeamsFilterOptions = {}): UseTeamsFil
       slack_user_id: member.slack_user_id,
       is_admin: member.is_admin,
       github_connected: !!member.github_username,
-      slack_connected: !!member.slack_user_id
+      slack_connected: !!member.slack_user_id,
+      avatar_url: member.avatar_url
     })),
     created_at: team.created_at,
     updated_at: team.updated_at
