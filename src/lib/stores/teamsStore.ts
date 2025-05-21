@@ -20,7 +20,7 @@ interface TeamsStore {
   clearError: () => void;
 }
 
-export const useTeamsStore = create<TeamsStore>((set, get) => ({
+export const useTeamsStore = create<TeamsStore>((set) => ({
   // Initial state
   teams: [],
   members: [],
@@ -35,12 +35,12 @@ export const useTeamsStore = create<TeamsStore>((set, get) => ({
       
       // Map API response to our Team type
       const teamsWithMembers: Team[] = await Promise.all(
-        data.map(async (team: any) => {
+        data.map(async (team: Team) => {
           // If members are already included in response, map them to TeamMember type
           let members: TeamMember[] | undefined;
           
           if (team.members) {
-            members = team.members.map((member: User) => ({
+            members = team.members.map((member: TeamMember) => ({
               id: member.id,
               org_id: member.org_id || '', // Provide default value if missing
               name: member.name,
@@ -49,7 +49,8 @@ export const useTeamsStore = create<TeamsStore>((set, get) => ({
               slack_user_id: member.slack_user_id,
               is_admin: member.is_admin,
               github_connected: !!member.github_username,
-              slack_connected: !!member.slack_user_id
+              slack_connected: !!member.slack_user_id,
+              avatar_url: member?.avatar_url
             }));
           } else {
             // Otherwise fetch members for this team
