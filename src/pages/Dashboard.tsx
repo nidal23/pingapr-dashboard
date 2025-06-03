@@ -26,6 +26,7 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import UsageBanner from "@/components/pricing/UsageBanner";
 
 const Dashboard = () => {
   const { data, isLoading, error, fetchDashboardData } = useDashboardStore();
@@ -37,6 +38,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <Layout>
+        <UsageBanner />
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold">Dashboard</h1>
