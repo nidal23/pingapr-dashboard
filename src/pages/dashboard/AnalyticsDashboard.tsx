@@ -13,6 +13,7 @@ import { TimePeriod } from "@/types/dashboard";
 import { useTeamsFilter } from '@/hooks/use-teams-filter';
 import { Users } from 'lucide-react';
 import { TooltipItem } from 'chart.js';
+import { useFeatureAccess } from "@/hooks/use-feature-access";
 // Chart.js imports for visualizations
 import {
   Chart as ChartJS,
@@ -28,6 +29,8 @@ import {
   Filler,
 } from "chart.js";
 import { Bar, Line, Pie } from "react-chartjs-2";
+import UsageBanner from "@/components/pricing/UsageBanner";
+import FeaturePreview from "@/components/pricing/FeaturePreview";
 
 // Register Chart.js components
 ChartJS.register(
@@ -82,6 +85,34 @@ const AnalyticsDashboard = () => {
     fetchRepositories();
   }, [fetchAnalyticsData, fetchRepositories]);
 
+
+  const { canAccessAnalytics } = useFeatureAccess();
+
+  console.log('can access analytics in analaytivs dashbaord: ', canAccessAnalytics)
+
+
+
+  if (!canAccessAnalytics) {
+    return (
+      <Layout>
+        <UsageBanner />
+        <FeaturePreview
+          title="Advanced Analytics Dashboard"
+          description="Get deep insights into your team's PR performance, merge rates, and productivity metrics."
+          features={[
+            "PR trend analysis over time",
+            "Team performance metrics",
+            "Merge rate tracking",
+            "Platform engagement insights",
+            "Review completion analytics",
+            "Repository breakdown charts"
+          ]}
+          // You can add a preview image here later
+          // previewImage="/images/analytics-preview.png"
+        />
+      </Layout>
+    );
+  }
   if (isLoading || reposLoading) {
     return (
       <Layout>
@@ -397,6 +428,7 @@ const AnalyticsDashboard = () => {
 
   return (
     <Layout>
+      <UsageBanner />
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>

@@ -17,6 +17,9 @@ import { TimePeriod } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
 import { useTeamsFilter } from '@/hooks/use-teams-filter';
 import { Users } from 'lucide-react';
+import FeaturePreview from "@/components/pricing/FeaturePreview";
+import UsageBanner from "@/components/pricing/UsageBanner";
+import { useFeatureAccess } from "@/hooks/use-feature-access";
 
 // Chart.js imports for visualizations
 import {
@@ -82,6 +85,9 @@ const CollaborationDashboard = () => {
   isLoading: teamsLoading 
 } = useTeamsFilter();
 
+
+const { canAccessCollaboration } = useFeatureAccess();
+
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const membersPerPage = 6;
@@ -90,6 +96,27 @@ const CollaborationDashboard = () => {
     fetchCollaborationData();
     fetchRepositories();
   }, [fetchCollaborationData, fetchRepositories]);
+
+
+  if (!canAccessCollaboration) {
+    return (
+      <Layout>
+        <UsageBanner />
+        <FeaturePreview
+          title="Team Collaboration Insights"
+          description="Understand how your team collaborates, review patterns, and knowledge sharing dynamics."
+          features={[
+            "Review network visualization",
+            "Team member activity tracking",
+            "Code review balance analysis",
+            "Knowledge sharing patterns",
+            "Collaboration metrics",
+            "Team performance comparisons"
+          ]}
+        />
+      </Layout>
+    );
+  }
 
   if (isLoading || reposLoading) {
     return (
