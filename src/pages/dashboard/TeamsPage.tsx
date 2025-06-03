@@ -15,6 +15,9 @@ import { useAuth } from "@/lib/stores/authStore";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Team, TeamMember } from "@/types/teams";
+import PremiumFeatureCard from "@/components/pricing/PremiumFeatureCard";
+import UsageBanner from "@/components/pricing/UsageBanner";
+import { useFeatureAccess } from "@/hooks/use-feature-access";
 // Helper function to get avatar for a user
 const getUserAvatar = (user: TeamMember) => {
   // First try to use the avatar_url from the user
@@ -48,6 +51,7 @@ const getUserInitials = (user: TeamMember) => {
 
 const TeamsPage = () => {
   const { user } = useAuth();
+  const { canCreateTeams } = useFeatureAccess();
   const { 
     teams,
     members,
@@ -150,6 +154,7 @@ const TeamsPage = () => {
   if (isLoading) {
     return (
       <Layout>
+        <UsageBanner />
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold">Teams</h1>
@@ -198,7 +203,7 @@ const TeamsPage = () => {
           <TabsContent value="custom-teams">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold">Custom Teams</h2>
-              {user?.is_admin && (
+              {user?.is_admin && canCreateTeams && (
                 <Button onClick={handleCreateTeam} className="flex items-center gap-2">
                   <Plus size={16} />
                   Create Team
@@ -206,14 +211,26 @@ const TeamsPage = () => {
               )}
             </div>
 
+            {!canCreateTeams && (
+              <PremiumFeatureCard
+                title="Custom Team Creation"
+                description="Create and manage custom teams to organize your members and filter dashboards by team performance."
+              />
+            )}
+
             {teams.length === 0 ? (
               <div className="bg-muted/30 border rounded-lg p-8 text-center">
                 <Users size={48} className="mx-auto text-muted-foreground/50 mb-4" />
-                <h3 className="text-lg font-medium mb-2">No teams created yet</h3>
+                <h3 className="text-lg font-medium mb-2">
+                  {canCreateTeams ? "No teams created yet" : "Custom teams available in Professional"}
+                </h3>
                 <p className="text-muted-foreground mb-4">
-                  Create custom teams to organize your members and filter dashboards
+                  {canCreateTeams 
+                    ? "Create custom teams to organize your members and filter dashboards"
+                    : "Upgrade to Professional to create custom teams and organize your members"
+                  }
                 </p>
-                {user?.is_admin && (
+                {user?.is_admin && canCreateTeams && (
                   <Button onClick={handleCreateTeam}>Create Your First Team</Button>
                 )}
               </div>
@@ -224,7 +241,8 @@ const TeamsPage = () => {
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
                         <CardTitle className="text-lg">{team.name}</CardTitle>
-                        {user?.is_admin && (
+                        {/* Only show edit/delete for professional users */}
+                        {user?.is_admin && canCreateTeams && (
                           <div className="flex gap-2">
                             <Button 
                               variant="ghost" 

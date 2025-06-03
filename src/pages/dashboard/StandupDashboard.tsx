@@ -18,6 +18,9 @@ import StatCard from "@/components/dashboard/StatCard";
 import { TimePeriod } from "@/types/dashboard";
 import { useTeamsFilter } from '@/hooks/use-teams-filter';
 import { Users } from 'lucide-react';
+import FeaturePreview from "@/components/pricing/FeaturePreview";
+import UsageBanner from "@/components/pricing/UsageBanner";
+import { useFeatureAccess } from "@/hooks/use-feature-access";
 
 const StandupDashboard = () => {
   const { 
@@ -36,6 +39,9 @@ const StandupDashboard = () => {
     // addDiscussionPoint,
     // removeDiscussionPoint
   } = useStandupStore();
+
+  const { canAccessStandup } = useFeatureAccess();
+
 
 
   const { 
@@ -66,6 +72,25 @@ const StandupDashboard = () => {
   //   }
   // };
 
+  if (!canAccessStandup) {
+    return (
+      <Layout>
+        <UsageBanner />
+        <FeaturePreview
+          title="Standup Dashboard"
+          description="Streamline your daily standups with focused PR insights and team activity summaries."
+          features={[
+            "Daily, weekly, and monthly PR summaries",
+            "Active PR tracking with reviewer status",
+            "Team performance metrics for standups",
+            "Focus mode for distraction-free meetings",
+            "Customizable time period filtering",
+            "Team-specific standup views"
+          ]}
+        />
+      </Layout>
+    );
+  }
   if (isLoading || reposLoading) {
     return (
       <Layout>
