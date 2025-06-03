@@ -17,7 +17,7 @@ const UsageBanner = () => {
   }, [fetchUsage]);
   
   // Don't show for professional users
-  if (!usage || usage.tier === 'PROFESSIONAL') return null;
+  if (!usage || usage.subscription_tier === 'PROFESSIONAL') return null;
   
   // Don't show if dismissed and usage is low
   if (isDismissed && !needsUpgrade) return null;
